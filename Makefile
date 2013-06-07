@@ -11,6 +11,10 @@ build: configure
 test: build
 	cabal test
 
+fasttest: ./dist_condee/build/tests/tests
+	cabal build
+	./dist_condee/build/tests/tests
+
 clean:
 	cabal clean
 

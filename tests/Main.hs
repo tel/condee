@@ -7,10 +7,23 @@ import Test.Framework.Providers.QuickCheck2
 
 import Test.HUnit
 
+import Control.Monad
+
 import Exp
+import Parse
+
+eval :: String -> Maybe Result
+eval = parseExp >=> interpret
 
 main :: IO ()
 main = defaultMain [
+  testGroup "Total unit" [
+
+     testCase "2/2 ==> fail"
+     (eval "2/2" @?= Nothing)
+     
+     ],
+  
   testGroup "Expression interpretation" [
 
      testCase "Booleans are preserved"

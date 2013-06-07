@@ -28,9 +28,9 @@ key : [fix, test]
 ```
 
 ```
-* [ , ] Add string support, single quotes
-* [ , ] Add string equality
-* [ , ] Add string concatenation
+* [x, ] Add string support, double quotes
+* [x, ] Add string equality
+* [x, ] Add string concatenation (+)
 * [x, ] Return `0`/`1`/`-1` for `true`/`false`/`something else`
 * [x, ] Change `fail` message to include why
 ```
@@ -39,5 +39,5 @@ key : [fix, test]
 ```
   key : [fix, test]
   
-* [x, ] 2/2 ==> fail
+* [x,x] 2/2 ==> fail
 ```
