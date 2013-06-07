@@ -25,5 +25,5 @@ Tested with GHC 7.6. Build is `make all`.
 ```
   key : [fix, test]
   
-* [x, ] Fail on parse of "2/2" ==> currently gives "ok num 2.0"
+* [x, ] 2/2 ==> fail
 ```
