@@ -25,17 +25,17 @@ parseExp :: String -> Maybe Exp
 parseExp = fmap Exp . hush . parse (expr <* eof) "expression"
 
 L.TokenParser {
-  L.parens     = parens,
-  L.reservedOp = reservedOp,
-  L.reserved   = reserved,
-  L.whiteSpace = whiteSpace,
-  L.naturalOrFloat = naturalOrFloat
+  L.parens         = parens,
+  L.reservedOp     = reservedOp,
+  L.reserved       = reserved,
+  L.whiteSpace     = whiteSpace,
+  L.naturalOrFloat = naturalOrFloat,
+  L.stringLiteral  = stringLiteral
   } = L.makeTokenParser
-      emptyDef { L.identLetter = alphaNum
-               , L.identStart = letter
-               , L.reservedNames = words "true false",
-                 L.reservedOpNames = words "& | ! - + * > < >= <= == ~"
-               }
+      emptyDef { L.identLetter     = alphaNum
+               , L.identStart      = letter
+               , L.reservedNames   = words "true false",
+                 L.reservedOpNames = words "& | ! - + * > < >= <= == ~" }
 
 hush :: Either s a -> Maybe a
 hush (Left s) = Nothing
@@ -66,7 +66,8 @@ table =  [ [ prefix "-" (Monop OpNegate . Exp), prefix "+" id ]
 
 
 val   =      Bool True  <$  reserved "true"      
-         <|> Bool False <$  reserved "false"     
+         <|> Bool False <$  reserved "false"
+         <|> String     <$> stringLiteral
          <|> Num        <$> allFloat
          <?> "value"
   where allFloat = f <$> naturalOrFloat

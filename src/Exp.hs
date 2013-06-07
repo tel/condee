@@ -22,22 +22,29 @@ data Binop  = OpLT | OpGT | OpLTE | OpGTE | OpApprox
 data Monop  = OpNot
             | OpNegate
             deriving (Eq, Show)
-data Type   = TyNum | TyBool deriving (Eq, Show)
+
 data ExpF a = Num Double
             | Bool Bool
+            | String String
             | Binop Binop a a
             | Monop Monop a
             deriving (Eq, Show)
+
+data Type   = TyNum | TyBool | TyString deriving (Eq, Show)
+
 newtype Exp  = Exp (ExpF Exp) deriving (Eq, Show)
 newtype TExp = TExp (ExpF TExp, Type) deriving (Eq, Show)
 
-data Result = RBool Bool | RNum Double deriving (Eq, Show)
+data Result = RBool Bool
+            | RNum Double
+            | RString String
+            deriving (Eq, Show)
 
 eps = 0.01
 
 doMonOp :: Monop -> Result -> Maybe Result
 doMonOp OpNot    (RBool b) = Just $ RBool $ not b
-doMonOp OpNegate (RNum  d) = Just $ RNum $ negate d
+doMonOp OpNegate (RNum  d) = Just $ RNum  $ negate d
 doMonOp _        _         = Nothing
 
 doBinOp :: Binop -> Result -> Result -> Maybe Result
@@ -47,6 +54,12 @@ doBinOp OpGT     (RNum a) (RNum b)   = Just $ RBool $ a > b
 doBinOp OpLTE    (RNum a) (RNum b)   = Just $ RBool $ a <= b
 doBinOp OpGTE    (RNum a) (RNum b)   = Just $ RBool $ a >= b
 doBinOp OpApprox (RNum a) (RNum b)   = Just $ RBool $ abs (a - b) < eps
+  -- String -> String -> Bool
+doBinOp OpApprox (RString a) (RString b) =
+  Just $ RBool $ a == b
+  -- String -> String -> String
+doBinOp OpPlus   (RString a) (RString b) =
+  Just $ RString $ a ++ b
   -- Num -> Num -> Num
 doBinOp OpPlus   (RNum a) (RNum b)   = Just $ RNum $ a + b
 doBinOp OpMinus  (RNum a) (RNum b)   = Just $ RNum $ a - b
@@ -57,9 +70,10 @@ doBinOp OpOr     (RBool a) (RBool b) = Just $ RBool $ a || b
 doBinOp _        _         _         = Nothing
 
 interpret :: Exp -> Maybe Result
-interpret (Exp (Num d))  = Just (RNum d)
-interpret (Exp (Bool d)) = Just (RBool d)
-interpret (Exp (Monop op a)) = interpret a >>= doMonOp op
+interpret (Exp (Num d))        = Just (RNum d)
+interpret (Exp (Bool d))       = Just (RBool d)
+interpret (Exp (String d))     = Just (RString d)
+interpret (Exp (Monop op a))   = interpret a >>= doMonOp op
 interpret (Exp (Binop op a b)) = do
   ra <- interpret a
   rb <- interpret b
