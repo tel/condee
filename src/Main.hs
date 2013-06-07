@@ -11,6 +11,7 @@
 module Main where
 
 import System.Environment
+import System.Exit
 import Control.Monad
 import Control.Applicative
 import Data.List
@@ -19,15 +20,21 @@ import Exp
 import Parse
 
 
-printer :: Maybe Result -> String
-printer Nothing = "fail"
-printer (Just x) = "ok " ++ printer' x where
-  printer' (RBool True)  = "bool true"
-  printer' (RBool False) = "bool false"
-  printer' (RNum  f)     = "num " ++ show f
+printer :: Result -> String
+printer (RBool True)  = "bool true"
+printer (RBool False) = "bool false"
+printer (RNum  f)     = "num " ++ show f
 
+die :: String -> IO ()
+die s = putStrLn ("fail: " ++ s) >> exitWith (ExitFailure (-1))
+
+main :: IO ()
 main = do
   args <- getArgs
   line <- if null args then getLine else return $ intercalate " " args
-  putStrLn . printer $ interpret <=< parseExp $ line
-  
+
+  case parseExp line of
+    Nothing  -> die "parse error"
+    Just ast -> case interpret ast of
+      Nothing -> die "type error"
+      Just res -> putStrLn (printer res)
