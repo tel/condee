@@ -19,8 +19,16 @@ main :: IO ()
 main = defaultMain [
   testGroup "Total unit" [
 
-     testCase "2/2 ==> fail"
-     (eval "2/2" @?= Nothing)
+     testCase "2/2 ==> fail" (eval "2/2" @?= Nothing),
+
+     testCase "\"string\" exists"
+     (eval "\"string\"" @?= Just (RString "string")),
+     
+     testCase "\"ab\" == \"ab\""
+     (eval "\"ab\" == \"ab\"" @?= Just (RBool True)),
+     
+     testCase "\"a\" + \"b\" == \"ab\""
+     (eval "\"a\" + \"b\" == \"ab\"" @?= Just (RBool True))
      
      ],
   

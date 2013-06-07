@@ -28,11 +28,9 @@ key : [fix, test]
 ```
 
 ```
-* [x, ] Add string support, double quotes
-* [x, ] Add string equality
-* [x, ] Add string concatenation (+)
-* [x, ] Return `0`/`1`/`-1` for `true`/`false`/`something else`
-* [x, ] Change `fail` message to include why
+* [x,x] Add string support, double quotes
+* [x,x] Add string equality
+* [x,x] Add string concatenation (+)
 ```
 
 # Bugs
