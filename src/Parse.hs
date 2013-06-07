@@ -22,7 +22,7 @@ import Text.Parsec.Language (emptyDef)
 import Exp
 
 parseExp :: String -> Maybe Exp
-parseExp = fmap Exp . hush . parse expr "expression"
+parseExp = fmap Exp . hush . parse (expr <* eof) "expression"
 
 L.TokenParser {
   L.parens     = parens,

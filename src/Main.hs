@@ -10,9 +10,14 @@
 -- Conditional expression parser for TDL2
 module Main where
 
+import System.Environment
+import Control.Monad
+import Control.Applicative
+import Data.List
+
 import Exp
 import Parse
-import Control.Monad
+
 
 printer :: Maybe Result -> String
 printer Nothing = "fail"
@@ -22,5 +27,7 @@ printer (Just x) = "ok " ++ printer' x where
   printer' (RNum  f)     = "num " ++ show f
 
 main = do
-  l <- getLine
-  putStrLn $ printer $ interpret <=< parseExp $ l
+  args <- getArgs
+  line <- if null args then getLine else return $ intercalate " " args
+  putStrLn . printer $ interpret <=< parseExp $ line
+  
