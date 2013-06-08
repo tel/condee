@@ -65,10 +65,10 @@ table =  [ [ prefix "-" (Monop OpNegate . Exp), prefix "+" id ]
              binary "|" (Binop OpOr `on` Exp) AssocLeft ] ]
 
 
-val   =      Bool True  <$  reserved "true"      
-         <|> Bool False <$  reserved "false"
-         <|> String     <$> stringLiteral
-         <|> Num        <$> allFloat
+val   =      Val (Bool True)  <$  reserved "true"      
+         <|> Val (Bool False) <$  reserved "false"
+         <|> Val . String     <$> stringLiteral
+         <|> Val . Num        <$> allFloat
          <?> "value"
   where allFloat = f <$> naturalOrFloat
         f (Left  int)   = fromIntegral int

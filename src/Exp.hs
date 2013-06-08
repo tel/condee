@@ -15,6 +15,11 @@ import Control.Applicative
 
 -- | The expression functor
 
+data Val = Num Double
+         | Bool Bool
+         | String String
+         deriving (Eq, Show)
+
 data Binop  = OpLT | OpGT | OpLTE | OpGTE | OpApprox
             | OpAnd | OpOr
             | OpPlus | OpMinus | OpMult
@@ -23,9 +28,7 @@ data Monop  = OpNot
             | OpNegate
             deriving (Eq, Show)
 
-data ExpF a = Num Double
-            | Bool Bool
-            | String String
+data ExpF a = Val Val
             | Binop Binop a a
             | Monop Monop a
             deriving (Eq, Show)
@@ -35,44 +38,39 @@ data Type   = TyNum | TyBool | TyString deriving (Eq, Show)
 newtype Exp  = Exp (ExpF Exp) deriving (Eq, Show)
 newtype TExp = TExp (ExpF TExp, Type) deriving (Eq, Show)
 
-data Result = RBool Bool
-            | RNum Double
-            | RString String
-            deriving (Eq, Show)
-
 eps = 0.01
 
-doMonOp :: Monop -> Result -> Maybe Result
-doMonOp OpNot    (RBool b) = Just $ RBool $ not b
-doMonOp OpNegate (RNum  d) = Just $ RNum  $ negate d
+doMonOp :: Monop -> Val -> Maybe Val
+doMonOp OpNot    (Bool b) = Just $ Bool $ not b
+doMonOp OpNegate (Num  d) = Just $ Num  $ negate d
 doMonOp _        _         = Nothing
 
-doBinOp :: Binop -> Result -> Result -> Maybe Result
+doBinOp :: Binop -> Val -> Val -> Maybe Val
   -- Num -> Num -> Bool
-doBinOp OpLT     (RNum a) (RNum b)   = Just $ RBool $ a < b
-doBinOp OpGT     (RNum a) (RNum b)   = Just $ RBool $ a > b
-doBinOp OpLTE    (RNum a) (RNum b)   = Just $ RBool $ a <= b
-doBinOp OpGTE    (RNum a) (RNum b)   = Just $ RBool $ a >= b
-doBinOp OpApprox (RNum a) (RNum b)   = Just $ RBool $ abs (a - b) < eps
+doBinOp OpLT     (Num a) (Num b)   = Just $ Bool $ a < b
+doBinOp OpGT     (Num a) (Num b)   = Just $ Bool $ a > b
+doBinOp OpLTE    (Num a) (Num b)   = Just $ Bool $ a <= b
+doBinOp OpGTE    (Num a) (Num b)   = Just $ Bool $ a >= b
+doBinOp OpApprox (Num a) (Num b)   = Just $ Bool $ abs (a - b) < eps
   -- String -> String -> Bool
-doBinOp OpApprox (RString a) (RString b) =
-  Just $ RBool $ a == b
+doBinOp OpApprox (String a) (String b) =
+  Just $ Bool $ a == b
   -- String -> String -> String
-doBinOp OpPlus   (RString a) (RString b) =
-  Just $ RString $ a ++ b
+doBinOp OpPlus   (String a) (String b) =
+  Just $ String $ a ++ b
   -- Num -> Num -> Num
-doBinOp OpPlus   (RNum a) (RNum b)   = Just $ RNum $ a + b
-doBinOp OpMinus  (RNum a) (RNum b)   = Just $ RNum $ a - b
-doBinOp OpMult   (RNum a) (RNum b)   = Just $ RNum $ a * b
+doBinOp OpPlus   (Num a) (Num b)   = Just $ Num $ a + b
+doBinOp OpMinus  (Num a) (Num b)   = Just $ Num $ a - b
+doBinOp OpMult   (Num a) (Num b)   = Just $ Num $ a * b
   -- Bool -> Bool -> Bool
-doBinOp OpAnd    (RBool a) (RBool b) = Just $ RBool $ a && b
-doBinOp OpOr     (RBool a) (RBool b) = Just $ RBool $ a || b
+doBinOp OpAnd    (Bool a) (Bool b) = Just $ Bool $ a && b
+doBinOp OpOr     (Bool a) (Bool b) = Just $ Bool $ a || b
 doBinOp _        _         _         = Nothing
 
-interpret :: Exp -> Maybe Result
-interpret (Exp (Num d))        = Just (RNum d)
-interpret (Exp (Bool d))       = Just (RBool d)
-interpret (Exp (String d))     = Just (RString d)
+interpret :: Exp -> Maybe Val
+interpret (Exp (Val (Num d)))        = Just (Num d)
+interpret (Exp (Val (Bool d)))       = Just (Bool d)
+interpret (Exp (Val (String d)))     = Just (String d)
 interpret (Exp (Monop op a))   = interpret a >>= doMonOp op
 interpret (Exp (Binop op a b)) = do
   ra <- interpret a

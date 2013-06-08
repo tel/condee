@@ -20,10 +20,11 @@ import Exp
 import Parse
 
 
-printer :: Result -> String
-printer (RBool True)  = "bool true"
-printer (RBool False) = "bool false"
-printer (RNum  f)     = "num " ++ show f
+printer :: Val -> String
+printer (Bool   True)  = "bool true"
+printer (Bool   False) = "bool false"
+printer (Num    f)     = "num " ++ show f
+printer (String s)     = "string " ++ show s
 
 die :: String -> IO ()
 die s = putStrLn ("fail: " ++ s) >> exitWith (ExitFailure (-1))

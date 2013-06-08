@@ -12,7 +12,7 @@ import Control.Monad
 import Exp
 import Parse
 
-eval :: String -> Maybe Result
+eval :: String -> Maybe Val
 eval = parseExp >=> interpret
 
 main :: IO ()
@@ -22,40 +22,40 @@ main = defaultMain [
      testCase "2/2 ==> fail" (eval "2/2" @?= Nothing),
 
      testCase "\"string\" exists"
-     (eval "\"string\"" @?= Just (RString "string")),
+     (eval "\"string\"" @?= Just (String "string")),
      
      testCase "\"ab\" == \"ab\""
-     (eval "\"ab\" == \"ab\"" @?= Just (RBool True)),
+     (eval "\"ab\" == \"ab\"" @?= Just (Bool True)),
      
      testCase "\"a\" + \"b\" == \"ab\""
-     (eval "\"a\" + \"b\" == \"ab\"" @?= Just (RBool True))
+     (eval "\"a\" + \"b\" == \"ab\"" @?= Just (Bool True))
      
      ],
   
   testGroup "Expression interpretation" [
 
      testCase "Booleans are preserved"
-     (interpret (Exp (Bool True)) @?= Just (RBool True)),
+     (interpret (Exp (Val (Bool True))) @?= Just (Bool True)),
 
      testCase "Doubles are preserved"
-     (interpret (Exp (Num 0.0)) @?= Just (RNum 0.0)),
+     (interpret (Exp (Val (Num 0.0))) @?= Just (Num 0.0)),
 
      testGroup "Operations..." [
        testGroup "Bool to Bool" [
           testProperty "and" $ \b1 b2 ->
-            Just (RBool (b1 && b2))
+            Just (Bool (b1 && b2))
             == interpret (Exp (Binop OpAnd
-                               (Exp (Bool b1))
-                               (Exp (Bool b2)))),
+                               (Exp (Val (Bool b1)))
+                               (Exp (Val (Bool b2))))),
           testProperty "or" $ \b1 b2 ->
-            Just (RBool (b1 || b2))
+            Just (Bool (b1 || b2))
             == interpret (Exp (Binop OpOr
-                               (Exp (Bool b1))
-                               (Exp (Bool b2)))),
+                               (Exp (Val (Bool b1)))
+                               (Exp (Val (Bool b2))))),
           testProperty "not" $ \b ->
-            Just (RBool (not b))
+            Just (Bool (not b))
             == interpret (Exp (Monop OpNot
-                               (Exp (Bool b))))
+                               (Exp (Val (Bool b)))))
           ],
 
        testGroup "Int to Bool" $ flip map [
@@ -66,20 +66,20 @@ main = defaultMain [
          ("approx", \a b -> abs (a - b) < eps, OpApprox)
          ] $ \(name, op, opCon) ->
            testProperty name $ \n1 n2 ->
-             Just (RBool (n1 `op` n2))
+             Just (Bool (n1 `op` n2))
              == interpret (Exp (Binop opCon
-                                (Exp (Num n1))
-                                (Exp (Num n2)))),
+                                (Exp (Val (Num n1)))
+                                (Exp (Val (Num n2))))),
 
        testGroup "Bool to Bool" $ flip map [
          ("and", (&&), OpAnd),
          ("or", (||), OpOr)
          ] $ \(name, op, opCon) ->
            testProperty name $ \n1 n2 ->
-             Just (RBool (n1 `op` n2))
+             Just (Bool (n1 `op` n2))
              == interpret (Exp (Binop opCon
-                                (Exp (Bool n1))
-                                (Exp (Bool n2))))
+                                (Exp (Val (Bool n1)))
+                                (Exp (Val (Bool n2)))))
 
              
        ]
