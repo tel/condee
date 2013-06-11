@@ -21,14 +21,14 @@ main = defaultMain [
 
      testCase "2/2 ==> fail" (eval "2/2" @?= Nothing),
 
-     testCase "\"string\" exists"
-     (eval "\"string\"" @?= Just (String "string")),
+     testCase "'string' exists"
+     (eval "'string'" @?= Just (String "string")),
      
-     testCase "\"ab\" == \"ab\""
-     (eval "\"ab\" == \"ab\"" @?= Just (Bool True)),
+     testCase "'ab' == 'ab'"
+     (eval "'ab' == 'ab'" @?= Just (Bool True)),
      
-     testCase "\"a\" + \"b\" == \"ab\""
-     (eval "\"a\" + \"b\" == \"ab\"" @?= Just (Bool True))
+     testCase "'a' + 'b' == 'ab'"
+     (eval "'a' + 'b' == 'ab'" @?= Just (Bool True))
      
      ],
   
