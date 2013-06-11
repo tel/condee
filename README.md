@@ -20,22 +20,3 @@ ok bool false
 ```
 
 Tested with GHC 7.6. Build is `make all`.
-
-# Todo
-
-```
-key : [fix, test]
-```
-
-```
-* [x,x] Add string support, double quotes
-* [x,x] Add string equality
-* [x,x] Add string concatenation (+)
-```
-
-# Bugs
-```
-  key : [fix, test]
-  
-* [x,x] 2/2 ==> fail
-```
